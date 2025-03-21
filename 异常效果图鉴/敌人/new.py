@@ -6,7 +6,7 @@ if len(a[1])==0:
 else:
     while 1:
         print(a[0][0],a[1])
-        b=input('直接回车更新，输入"q"退出')
+        b=input('数据已保存\n直接回车进行半自动化更新，输入"q"退出')
         if b=='':
             cl.yy(a[1],gjc)
             break

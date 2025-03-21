@@ -104,12 +104,13 @@ def gx(xwb,qzgx=0):
                     rzsc+='*删除\n\n'
                 for a in js:
                     rzsc+=a+'\n'
-                if jspd!=0 and len(zj)!=0:
+                if jspd!=0:
                     rzsc+='\n'
                 if len(zj)!=0:
                     rzsc+='*增加\n\n'
                 for a in zj:
                     rzsc+=a+'\n'
+                rzsc+='\n'
                 if jspd!=0 and len(zj)==0:
                     gxpd=1
                     bc=[3,'有删除']
@@ -124,9 +125,10 @@ def gx(xwb,qzgx=0):
                     fh=zj
                     bc=[2,'有更新']
             elif len(zj)!=0 and int(ycd)+len(zj)==cd and qzgx==0:
-                rzsc=rq+' '+str(len(sj))+'更新:\n增加\n'
+                rzsc=rq+' '+str(len(sj))+'更新:\n*增加\n\n'
                 for a in zj:
                     rzsc+=a+'\n'
+                rzsc+='\n'
                 gxpd=1
                 hcpd=1
                 fh=zj
@@ -184,7 +186,8 @@ def fg(sj):
     wb=sj[1]
     pd=wb.find('<textarea')
     if pd==-1:
-        input(wb+'\n出错了')
+        input('\n出错了')
+        print(wb)
         return None
     pd=wb.index('>',pd)
     zc=wb.index('</textarea>',pd)
@@ -240,7 +243,7 @@ def fg0(sj):
         zfh.append(fh)
     return [dr,zfh]
 #print(fg0(fg(hq('杜卡雷，“君主之红”'))))
-def find(zsj,gjc):
+def find(zsj,gjc,ks=0):
     if zsj==None:
         print('请检查网络连接')
         return None
@@ -264,20 +267,18 @@ def find(zsj,gjc):
             fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=天赋\n'+'|等级='+dj+'\n}}'
             print('\n天赋 '+gjc+'\n\n'+fh)
             pyperclip.copy(fh)
-    if pd==0:
+            input()
+    if pd==0 and ks==0:
         print('未发现'+gjc)
     return pd
 #find(fg0(fg(hq('杜卡雷，“君主之红”'))),'晕眩')
-def cx(dr,gjc):
+def cx(dr,gjc,ks=0):
     print(dr+'\n')
     sj=fg0(fg(hq(dr)))
     for a in gjc:
-        find(sj,a)
+        find(sj,a,ks=ks)
 #cx('杜卡雷，“君主之红”',['晕眩','寒冷'])
-def yy(dr,gjc):
+def yy(dr,gjc,ks=0):
     for a in dr:
-        cx(a,gjc)
+        cx(a,gjc,ks=ks)
     print('已完成')
-        
-
-

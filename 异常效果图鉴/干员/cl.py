@@ -84,7 +84,7 @@ def fg2(sj):
 for b in a:
     for c in b:
         print(c+'\n\n')'''
-def tf(gy,wb,gjc):
+def tf(gy,wb,gjc,ks=0):
     fx=1
     qn=''
     bz=''
@@ -137,7 +137,8 @@ def tf(gy,wb,gjc):
         pd=wb.index('效果=',wb.rindex(cx+'效果='))
         ms=wb[pd+3:wb.index('\n',pd)].strip()
         if ms.find(gjc)==-1 and bz.find(gjc)==-1:
-            print('未发现'+gjc)
+            if ks==0:
+                print('未发现'+gjc)
         else:
             mc=wb[wb.index('=',wb.rindex(cx+'='))+1:wb.index('\n|',wb.rindex(cx+'='))]
             while ms.find('{{术语')!=-1:
@@ -182,7 +183,7 @@ def yytf(wb,gjc,ks=0):
         print('*无天赋')
     for wb0 in wb[1]:
         for gjc0 in gjc:
-            pd=tf(gy,wb0,gjc0)
+            pd=tf(gy,wb0,gjc0,ks=ks)
             if pd==2:
                 mzcw=1
             elif pd==3:
@@ -298,7 +299,8 @@ def jn(gy,wb,gjc):
             pyperclip.copy(fh)
             input()
     else:
-        print('未发现'+gjc)
+        if ks==0:
+            print('未发现'+gjc)
     return fx
 def yyjn(wb,gjc,ks=0):
     if wb==0:
@@ -309,7 +311,7 @@ def yyjn(wb,gjc,ks=0):
         print('*无技能')
     for wb0 in wb[2]:
         for gjc0 in gjc:
-            pd=jn(gy,wb0,gjc0)
+            pd=jn(gy,wb0,gjc0,ks=ks)
             if pd==0:
                 mzcw=1
         if mzcw==1:
@@ -319,7 +321,7 @@ def yyjn(wb,gjc,ks=0):
             input('已完成\n')
     return 1
 #yyjn(fg2(fg(hq('W'))),['冻结','寒冷','晕眩','眩晕'])
-def mz(gy,wb,gjc):
+def mz(gy,wb,gjc,ks=0):
     bz=''
     if wb.find('|基础证章=yes')!=-1:
         return 2
@@ -356,7 +358,8 @@ def mz(gy,wb,gjc):
             pyperclip.copy(fh)
             input()
         else:
-            print('未发现'+gjc)
+            if ks==0:
+                print('未发现'+gjc)
     return 1
 def yymz(wb,gjc,ks=0):
     if wb==0:
@@ -367,7 +370,7 @@ def yymz(wb,gjc,ks=0):
         print('*无模组')
     for wb0 in wb[3]:
         for gjc0 in gjc:
-            pd=mz(gy,wb0,gjc0)
+            pd=mz(gy,wb0,gjc0,ks=ks)
             if pd==0:
                 mzcw=1
             elif pd==2:
@@ -393,7 +396,7 @@ def cx(wb,gjc,ks=0):
         print('*无天赋')
     for tf0 in tfz:
         for gjc0 in gjc:
-            pd=tf(gy,tf0,gjc0)
+            pd=tf(gy,tf0,gjc0,ks=ks)
             if pd==2:
                 mzcw=1
             elif pd==3:
@@ -414,7 +417,7 @@ def cx(wb,gjc,ks=0):
         print('*无技能')
     for jn0 in jnz:
         for gjc0 in gjc:
-            pd=jn(gy,jn0,gjc0)
+            pd=jn(gy,jn0,gjc0,ks=ks)
             if pd==0:
                 mzcw=1
         if mzcw==1:
@@ -425,7 +428,7 @@ def cx(wb,gjc,ks=0):
         print('*无模组')
     for mz0 in mzz:
         for gjc0 in gjc:
-            pd=mz(gy,mz0,gjc0)
+            pd=mz(gy,mz0,gjc0,ks=ks)
             if pd==0:
                 mzcw=1
             elif pd==2:

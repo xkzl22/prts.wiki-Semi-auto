@@ -1,445 +1,298 @@
 from requests import *
-import pyperclip
+import pyperclip,html,time
 def xz():
-    d=[]
-    b=get('https://prts.wiki/w/%E9%A6%96%E9%A1%B5/%E4%BA%AE%E7%82%B9%E5%B9%B2%E5%91%98/%E8%BF%91%E6%9C%9F%E6%96%B0%E5%A2%9E')
-    a=b.text
-    a=a[a.index('<span>',a.index('::before')+6):]
-    a=a[:a.index('</div>')]
-    while a.find('title="')!=-1:
-        a=a[a.find('title="')+7:]
-        c=a[:a.find('>')-1]
-        d.append(c)
-    return d
-#print(xz())
-def hq(gy):
+    url='https://prts.wiki/w/%E5%88%86%E7%B1%BB:%E6%95%8C%E4%BA%BA'
+    sj=''
+    xh=1
+    while xh:
+        response=get(url)
+        wb=html.unescape(response.text)
+        pd=wb.index('上一页')
+        if wb.find('（下一页）<div',pd)!=-1:
+            xh=0
+        else:
+            pd=wb.index('<a href="',pd)+9
+            zc=wb.index('" title=',pd)
+            url='https://prts.wiki'+wb[pd:zc]
+        pd=wb.index('<li>',pd)
+        zc=wb.index('上一页',pd)
+        zc=wb.rindex('</li>',0,zc)+5
+        sj+=wb[pd:zc]
+    return sj
+'''with open('cs.txt','w',encoding='utf-8') as cs:
+    cs.write(xz())
+    cs.close()'''
+def dq():
+    fgf='|%|'
+    try:
+        with open('sj\\sj.txt','r',encoding='utf-8') as ywb:
+            wb=ywb.read()
+        pd=wb.index('|&|')
+        cd=int(wb[:pd])
+        wb=wb[pd+3:]
+        pd=wb.index('|*|')
+        rq=wb[:pd]
+        wb=wb[pd+3:]
+        sj=wb.split(fgf)
+        return [rq,cd,sj]
+    except FileNotFoundError:
+        return None
+#print(dq())
+def gx(xwb,qzgx=0):
+    fgf='|%|'
+    sj=[]
+    zj=[]
+    js=[]
+    bl=[]
+    de=[]
+    sr=dq()
+    bc=None
+    fh=None
+    gxpd=0
+    hcpd=0
     while 1:
-        b=get('https://prts.wiki/index.php?title='+gy+'&action=edit')
-        if b.status_code!=200:
-            d=input('出错了'+str(b.status_code))
-            if d=='q':
-                return 0
+        pd=xwb.find('title="')
+        if pd==-1:
+            break
+        zc=xwb.index('">',pd)
+        sj.append(xwb[pd+7:zc])
+        xwb=xwb[xwb.index('</li>')+5:]
+    cd=len(sj)
+    rq=time.strftime("%y%m%d")
+    if sr==None:
+        rzsc=rq+' '+str(cd)+'\n已创建\n'
+        gxpd=1
+        bc=[1,'无数据，已保存本次读取的数据']
+    else:
+        yrq=sr[0]
+        ycd=sr[1]
+        ysj=sr[2]
+        if ycd==cd and qzgx==0:
+            bc=[0,'初步检查未更新']
+        else:
+            for a in sj:
+                if not a in ysj:
+                    zj.append(a)
+            if int(ycd)+len(zj)>cd:
+                print(ycd,len(zj),cd)
+                for a in ysj:
+                    if not a in sj:
+                        js.append(a)
+                for xh,a in enumerate(js):
+                    while 1:
+                        if len(zj)!=0:
+                            print('增加的敌人:')
+                            for b in zj:
+                                print(b)
+                            print()
+                        xz=input(a+' 删除(d)/保留(r)').strip()[0]
+                        if xz=='d' or xz=='r':
+                            break
+                    if xz=='r':
+                        sj.append(a)
+                        de.append(xh)
+                        print('已保留')
+                    elif xz=='d':
+                        print('已删除')
+                for xh,a in enumerate(de):
+                    del js[a-xh]
+                for a in bl:
+                    js.append(a)
+                jspd=len(js)
+                rzsc=rq+' '+str(len(sj))+'更新:\n'
+                if jspd!=0:
+                    rzsc+='*删除\n\n'
+                for a in js:
+                    rzsc+=a+'\n'
+                if jspd!=0:
+                    rzsc+='\n'
+                if len(zj)!=0:
+                    rzsc+='*增加\n\n'
+                for a in zj:
+                    rzsc+=a+'\n'
+                rzsc+='\n'
+                if jspd!=0 and len(zj)==0:
+                    gxpd=1
+                    bc=[3,'有删除']
+                elif jspd!=0:
+                    gxpd=1
+                    hcpd=1
+                    fh=zj
+                    bc=[4,'有删除与更新']
+                else:
+                    gxpd=1
+                    hcpd=1
+                    fh=zj
+                    bc=[2,'有更新']
+            elif len(zj)!=0 and int(ycd)+len(zj)==cd and qzgx==0:
+                rzsc=rq+' '+str(len(sj))+'更新:\n*增加\n\n'
+                for a in zj:
+                    rzsc+=a+'\n'
+                rzsc+='\n'
+                gxpd=1
+                hcpd=1
+                fh=zj
+                bc=[2,'有更新']
+            elif len(zj)==0:
+                bc=[0,'已确认无更新']
+            else:
+                bc=[-1,'列表比对出错']
+                fh=[ysj,zj,sj]
+    if gxpd==1:
+        sjsc=str(len(sj))+'|&|'
+        sjsc+=rq+'|*|'
+        sjsc+=sj[0]
+        for a in sj[1:]:
+            sjsc+=fgf+a
+        with open('sj\\sj.txt','w',encoding='utf-8') as sjwj:
+            sjwj.write(sjsc)
+        with open('sj\\日志.txt','a',encoding='utf-8') as rz:
+            rz.write(rzsc)
+    if hcpd==1:
+        with open('sj\\hc.txt','w',encoding='utf-8') as hcwj:
+            hcsc=zj[0]
+            for a in zj[1:]:
+                hcsc+=fgf+a
+            hcwj.write(hcsc)
+    return [bc,fh]
+#print(gx(xz()))
+def dqhc():
+    fgf='|%|'
+    try:
+        with open('sj\\hc.txt','r',encoding='utf-8') as hc:
+            wb=hc.read()
+        sj=wb.split(fgf)
+        return [sj]
+    except FileNotFoundError:
+        return None
+#print(dqhc())
+def hq(dr):
+    url='https://prts.wiki/index.php?title='+dr+'&action=edit'
+    while 1:
+        dx=get(url)
+        if dx.status_code!=200:
+            xw=input('出错了'+str(b.status_code))
+            if xw=='q':
+                return None
         else:
             break
-    a=b.text
-    while a.find('&lt;')!=-1:
-        a=a[:a.find('&lt;')]+'<'+a[a.find('&lt;')+4:]
-    try:
-        a=a[a.index('干员页面名')-2:a.index('{{干员导航}}')+8]
-    except:
-        input('出错了\n'+a)
-    c=[gy,a]
-    return c
-#print(hq('红'))
+    wb=html.unescape(dx.text)
+    return [dr,wb]
+#print(hq('源石虫'))
 def fg(sj):
-    if sj==0:
-        return 0
-    gy=sj[0]
-    sj=sj[1]
-    fh=[gy]
-    fh.append(sj[sj.index('==天赋=='):sj.index('==',sj.index('==天赋==')+6)])
-    fh.append(sj[sj.index('==技能=='):sj.index('==',sj.index('==技能==')+6)])
-    a1=sj.find('==模组==')
-    if a1!=-1:
-        a2=a1+6
+    if sj==None:
+        return None
+    dr=sj[0]
+    wb=sj[1]
+    pd=wb.find('<textarea')
+    if pd==-1:
+        input('\n出错了')
+        print(wb)
+        return None
+    pd=wb.index('>',pd)
+    zc=wb.index('</textarea>',pd)
+    fh=wb[pd+1:zc]
+    return [dr,fh]
+#print(fg(hq('杜卡雷，“君主之红”')))
+def fg0(sj):
+    if sj==None:
+        return None
+    dr=sj[0]
+    wb=sj[1]
+    zfh=[]
+    while 1:
+        fh=[]
+        pd=wb.find('==级别')
+        if pd==-1:
+            break
+        pd=wb.index('{{敌人信息/level',pd)
+        zc=wb.index('\n}}',pd)
+        sj0=wb[pd:zc+3]
+        yw=sj0
+        wb=wb[zc+3:]
+        pd=sj0.index('|index=')
+        fh.append(sj0[pd+7])
+        fh0=[]
         while 1:
-            a2=sj.index('==',a2)
-            if sj.find('===',a2)==a2:
-                a2+=3
-            else:
-                fh.append(sj[a1:a2])
+            pd=sj0.find('效果=')
+            if pd==-1:
                 break
-    else:
-        fh.append('无模组')
-    return fh
-'''a=fg(hq('煌'))
-print(a[0],a[1],a[2],a[3],sep='\n')'''
-def fg2(sj):
-    if sj==0:
-        return 0
-    gy=sj[0]
-    tf=[]
-    jn=[]
-    mz=[]
-    pd=sj[1].find('{{天赋列表')
-    while pd!=-1:
-        zc=sj[1].find('{{天赋列表',pd+6)
-        tf.append(sj[1][pd:zc].strip())
-        sj[1]=sj[1][zc:]
-        pd=sj[1].find('{{天赋列表')
-    pd=sj[2].find("'''技能")
-    while pd!=-1:
-        zc=sj[2].find("'''技能",pd+5)
-        jn.append(sj[2][pd:zc].strip())
-        sj[2]=sj[2][zc:]
-        pd=sj[2].find("'''技能")
-    pd=sj[3].find("===")
-    while pd!=-1:
-        zc=sj[3].find("\n===",pd+3)
-        mz.append(sj[3][pd:zc].strip())
-        sj[3]=sj[3][zc:]
-        pd=sj[3].find("===")
-    return [gy,tf,jn,mz]
-'''a=fg2(fg(hq('煌')))
-for b in a:
-    for c in b:
-        print(c+'\n\n')'''
-def tf(gy,wb,gjc,ks=0):
-    fx=1
-    qn=''
-    bz=''
-    yw=wb
-    jy='0'
-    cxpd=0
-    pd=wb.find('<references')
-    if pd!=-1:
-        wb=wb[:pd].strip()
-        #fx=3
-    pd=wb.rfind('=潜能')
-    if pd!=-1:
-        qn=wb[pd+3]
-        cxpd=1
-        cx=wb[wb.rindex('天赋',0,pd):wb.rindex('条件',0,pd)]
-    pd=wb.find('|潜能增强=')
-    if pd!=-1:
-        qn=wb[pd+6]
-        cxpd=2
-    pd=wb.find('|备注=')
-    if pd!=-1:
-        bz='\n\n\n'+wb[pd:-3]
-        wb=wb[:pd]+wb[-3:]
-    pd=wb.rfind('模组')
-    if pd!=-1:
-        pd=wb.rindex('模组2',0,pd)
-        if wb.rfind('精英2',0,pd-5)!=-1:
-            jy='2'
-            pd=wb.rindex('精英2',0,pd-5)
-        elif wb.rfind('精英1',0,pd-5)!=-1:
-            jy='1'
-            pd=wb.rfind('精英1',0,pd-5)
-        else:
-            fx=2
-    else:
-        if wb.rfind('精英2')!=-1:
-            jy='2'
-        elif wb.rfind('精英1')!=-1:
-            jy='1'
-        pd=wb.rfind('条件=')
+            dj=sj0[pd-1]
+            zc=sj0.find('\n|',pd)
+            zc0=sj0.find('\n}}',pd)
+            if zc==-1:
+                zc=zc0
+            elif zc0!=-1 and zc>zc0:
+                zc=zc0
+            elif zc!=-1:
+                pass
+            else:
+                input(sj0+'\n\n'+'敌人分割错误')
+                return 0
+            fh0.append([dj,sj0[pd+3:zc]])
+            sj0=sj0[zc:]
+        fh.append(fh0)
+        pd=sj0.find('|天赋=')
         if pd==-1:
-            fx=0
+            fh.append(None)
         else:
-            pd+=3
-    if cxpd!=1:
-        print
-        cx=wb[wb.rindex('天赋',0,pd):wb.rindex('条件',0,pd)]
-    cxzc=wb.rindex(cx)
-    if fx==1:
-        pd=wb.index('效果=',wb.rindex(cx+'效果='))
-        ms=wb[pd+3:wb.index('\n',pd)].strip()
-        if ms.find(gjc)==-1 and bz.find(gjc)==-1:
-            if ks==0:
-                print('未发现'+gjc)
-        else:
-            mc=wb[wb.index('=',wb.rindex(cx+'='))+1:wb.index('\n|',wb.rindex(cx+'='))]
-            while ms.find('{{术语')!=-1:
-                pd=ms.index('{{术语')
-                ms0=ms[:pd]
-                pd=ms.index('|',pd+6)
-                zc=ms.index('}}',pd)
-                sy=ms[pd+1:zc]
-                ms=ms0+sy+ms[zc+2:]
-            while ms.find('{{异常效果')!=-1:
-                pd=ms.index('{{异常效果')
-                zc=ms.index('}}',pd)
-                sy=ms[pd+7:zc]
-                ms=ms[:pd]+sy+ms[zc+2:]
-            while bz.find('{{术语')!=-1:
-                pd=bz.index('{{术语')
-                bz0=bz[:pd]
-                pd=bz.index('|',pd+6)
-                zc=bz.index('}}',pd)
-                sy=bz[pd+1:zc]
-                bz=bz0+sy+bz[zc+2:]
-            while bz.find('{{异常效果')!=-1:
-                pd=bz.index('{{异常效果')
-                zc=bz.index('}}',pd)
-                sy=bz[pd+7:zc]
-                bz=bz[:pd]+sy+bz[zc+2:]
-            fh='{{异常状态作用范围/干员\n|干员='+gy+'\n|类型=天赋|名称='+mc+'\n|精英='+jy
-            if qn!='':
-                fh+='|潜能='+qn
-            fh+='\n|描述='+ms+'\n}}'
-            print('\n'+gjc+'\n\n'+fh+bz)
+            zc=sj0.index('\n}}')
+            fh.append(sj0[pd+4:zc])
+        fh.append(yw)
+        zfh.append(fh)
+    return [dr,zfh]
+#print(fg0(fg(hq('杜卡雷，“君主之红”'))))
+def find(zsj,gjc,ks=0):
+    if zsj==None:
+        print('请检查网络连接')
+        return None
+    dr=zsj[0]
+    sj=zsj[1]
+    pd=0
+    for a in sj:
+        dj=a[0]
+        for b in a[1]:
+            if b[1].find(gjc)!=-1:
+                pd=1
+                jn=b[0]
+                if dj!='0':
+                    if jn!='0':
+                        fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=技能\n'+'|等级='+dj+'\n|技能='+jn+'\n}}'
+                    else:
+                        fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=技能\n'+'|等级='+dj+'\n}}'
+                else:
+                    if jn!='0':
+                        fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=技能\n'+'|技能='+jn+'\n}}'
+                    else:
+                        fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=技能\n}}'
+                print(b[1])
+                print('\n\n技能 '+gjc+'\n\n'+fh)
+                pyperclip.copy(fh)
+                input()
+        if a[2]==None:
+            pass
+        elif a[2].find(gjc)!=-1:
+            pd=1
+            if dj!='0':
+                fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=天赋\n'+'|等级='+dj+'\n}}'
+            else:
+                fh='{{异常状态作用范围/敌人\n|敌人='+dr+'\n|类型=天赋\n'+'}}'
+            print(a[2])
+            print('\n\n天赋 '+gjc+'\n\n'+fh)
             pyperclip.copy(fh)
             input()
-    return fx
-def yytf(wb,gjc,ks=0):
-    mzcw=0
-    if wb==0:
-        print('请检查网络连接')
-        return
-    gy=wb[0]
-    if len(wb[1])==0:
-        print('*无天赋')
-    for wb0 in wb[1]:
-        for gjc0 in gjc:
-            pd=tf(gy,wb0,gjc0,ks=ks)
-            if pd==2:
-                mzcw=1
-            elif pd==3:
-                mzcw=2
-            elif pd==0:
-                mzcw=3
-        if mzcw==2:
-            print(wb0)
-            input('\n错误：有注释\n')
-        elif mzcw==1:
-            print(wb0)
-            if ks==0:
-                input('\n错误：可能为模组新增天赋\n')
-            else:
-                print('\n错误：可能为模组新增天赋\n')
-        elif mzcw==3:
-            print(wb0)
-            input('\n错误：疑似无文本\n')
-        if ks==0:
-            input('已完成\n')
-    return 1
-#yytf(fg2(fg(hq('古米'))),['冻结','寒冷','晕眩','眩晕'])
-def jn(gy,wb,gjc):
-    cwdm=0
-    fx=1
-    pd=wb.find('<references')
-    if pd!=-1:
-        yw=wb
-        wb=wb[:pd].strip()
-        cwdm=1
-    bz=''
-    pd=wb.find('|备注=')
-    if pd!=-1:
-        bz='\n\n\n'+wb[pd:-3]
-        wb=wb[:pd]+wb[-3:]
-    while bz.find('{{术语')!=-1:
-        pd=bz.index('{{术语')
-        bz0=bz[:pd]
-        pd=bz.index('|',pd+6)
-        zc=bz.index('}}',pd)
-        sy=bz[pd+1:zc]
-        bz=bz0+sy+bz[zc+2:]
-    while bz.find('{{异常效果')!=-1:
-        pd=bz.index('{{异常效果')
-        zc=bz.index('}}',pd)
-        sy=bz[pd+7:zc]
-        bz=bz[:pd]+sy+bz[zc+2:]
-    pd=wb.find(gjc)
-    if pd!=-1 or bz.find(gjc)!=-1:
-        pd=wb.find('技能名=')
-        if pd==-1:
-            fx=0
-        else:
-            mc=wb[pd+4:wb.index('\n|',pd+4)]
-            pd=wb.index('类型1=')
-            zc=wb[pd+4:wb.index('\n|',pd+4)].strip()
-            if zc=='被动':
-                cf='\n|触发='+zc
-                pd=wb.rindex('持续=')
-                cx=wb[pd+3:wb.index('\n}}',pd+3)].strip()
-                pd=wb.rindex('描述=')
-                ms=wb[pd+3:wb.index('\n|',pd+3)]
-                while ms.find('{{术语')!=-1:
-                    pd=ms.index('{{术语')
-                    ms0=ms[:pd]
-                    pd=ms.index('|',pd+6)
-                    zc=ms.index('}}',pd)
-                    sy=ms[pd+1:zc]
-                    ms=ms0+sy+ms[zc+2:]
-                while ms.find('{{异常效果')!=-1:
-                    pd=ms.index('{{异常效果')
-                    zc=ms.index('}}',pd)
-                    sy=ms[pd+7:zc]
-                    ms=ms[:pd]+sy+ms[zc+2:]
-                fh='{{异常状态作用范围/干员\n|干员='+gy+'\n|类型=技能|名称='+mc+cf
-                if cx!='':
-                    fh+='|持续='+cx
-                fh+='\n|描述='+ms+'\n}}'
-            else:
-                hf=zc
-                pd=wb.index('类型2=')
-                cf=wb[pd+4:wb.index('\n|',pd+4)]
-                pd=wb.rindex('初始=')
-                cs=wb[pd+3:wb.index('\n|',pd+3)]
-                pd=wb.rindex('消耗=')
-                xh=wb[pd+3:wb.index('\n|',pd+3)]
-                pd=wb.rindex('持续=')
-                cx=wb[pd+3:wb.index('\n}}',pd+3)].strip()
-                pd=wb.rindex('描述=')
-                ms=wb[pd+3:wb.index('\n|',pd+3)]
-                while ms.find('{{术语')!=-1:
-                    pd=ms.index('{{术语')
-                    ms0=ms[:pd]
-                    pd=ms.index('|',pd+6)
-                    zc=ms.index('}}',pd)
-                    sy=ms[pd+1:zc]
-                    ms=ms0+sy+ms[zc+2:]
-                while ms.find('{{异常效果')!=-1:
-                    pd=ms.index('{{异常效果')
-                    zc=ms.index('}}',pd)
-                    sy=ms[pd+7:zc]
-                    ms=ms[:pd]+sy+ms[zc+2:]
-                fh='{{异常状态作用范围/干员\n|干员='+gy+'\n|类型=技能|名称='+mc+'\n|回复='+hf+'|触发='+cf
-                if cs!='0' and cs!='':
-                    fh+='|初始='+cs
-                fh+='|消耗='+xh
-                if cx!='':
-                    fh+='|持续='+cx
-                fh+='\n|描述='+ms+'\n}}'
-            if cwdm==1:
-                print(yw+'\n错误：有注释')
-            print('\n'+gjc+'\n\n'+fh+bz)
-            pyperclip.copy(fh)
-            input()
-    else:
-        if ks==0:
-            print('未发现'+gjc)
-    return fx
-def yyjn(wb,gjc,ks=0):
-    if wb==0:
-        print('请检查网络连接')
-        return
-    gy=wb[0]
-    if len(wb[2])==0:
-        print('*无技能')
-    for wb0 in wb[2]:
-        for gjc0 in gjc:
-            pd=jn(gy,wb0,gjc0,ks=ks)
-            if pd==0:
-                mzcw=1
-        if mzcw==1:
-            print(wb0)
-            input('\n错误：疑似无文本\n')
-        if ks==0:
-            input('已完成\n')
-    return 1
-#yyjn(fg2(fg(hq('W'))),['冻结','寒冷','晕眩','眩晕'])
-def mz(gy,wb,gjc,ks=0):
-    bz=''
-    if wb.find('|基础证章=yes')!=-1:
-        return 2
-    else:
-        pd=wb.rfind('=天赋')
-        if pd==-1:
-            return 0
-        tf=wb[pd+1:wb.index('\n|',pd+1)]
-        if tf.find(gjc)!=-1:
-            pd=wb.index('|天赋2=')
-            tf0=wb[pd+5:wb.index('\n|',pd+1)]
-            if tf0.find(gjc)!=-1 and tf0.find('新增天赋')!=-1:
-                bz='\n|备注=2级后解锁'
-            else:
-                bz='\n|备注=2级后更新'
-            pd=wb.index('|名称=')
-            mc=wb[pd+4:wb.index('\n|',pd+4)]
-            pd=wb.index('|类型=')
-            lx=wb[pd+4:wb.index('\n|',pd+4)]
-            while tf.find('{{术语')!=-1:
-                pd=tf.index('{{术语')
-                tf0=tf[:pd]
-                pd=tf.index('|',pd+6)
-                zc=tf.index('}}',pd)
-                sy=tf[pd+1:zc]
-                tf=tf0+sy+tf[zc+2:]
-            while tf.find('{{异常效果')!=-1:
-                pd=tf.index('{{异常效果')
-                zc=tf.index('}}',pd)
-                sy=tf[pd+7:zc]
-                tf=tf[:pd]+sy+tf[zc+2:]
-            fh='{{异常状态作用范围/干员\n|干员='+gy+'\n|类型=模组|名称='+mc+'|模组类型='+lx+'|模组等级=3\n|描述='+tf+bz+'\n}}'
-            print('\n'+gjc+'\n\n'+fh)
-            pyperclip.copy(fh)
-            input()
-        else:
-            if ks==0:
-                print('未发现'+gjc)
-    return 1
-def yymz(wb,gjc,ks=0):
-    if wb==0:
-        print('请检查网络连接')
-        return
-    gy=wb[0]
-    if len(wb[3])==0:
-        print('*无模组')
-    for wb0 in wb[3]:
-        for gjc0 in gjc:
-            pd=mz(gy,wb0,gjc0,ks=ks)
-            if pd==0:
-                mzcw=1
-            elif pd==2:
-                mzcw=2
-        if mzcw==1:
-            input('\n新模组未规范化，请前往手动编辑规范\n')
-        elif mzcw==2:
-            print('\n*基础模组\n')
-        if ks==0:
-            input('已完成\n')
-    return 1
-#yymz(fg2(fg(hq('初雪'))),['冻结','寒冷','晕眩','眩晕'])
-def cx(wb,gjc,ks=0):
-    mzcw=0
-    if wb==0:
-        print('请检查网络连接')
-        return 0
-    gy=wb[0]
-    tfz=wb[1]
-    jnz=wb[2]
-    mzz=wb[3]
-    if len(tfz)==0:
-        print('*无天赋')
-    for tf0 in tfz:
-        for gjc0 in gjc:
-            pd=tf(gy,tf0,gjc0,ks=ks)
-            if pd==2:
-                mzcw=1
-            elif pd==3:
-                mzcw=2
-            elif pd==0:
-                mzcw=3
-        if mzcw==2:
-            print(tf0)
-            input('\n错误：有注释\n')
-        elif mzcw==1:
-            print(tf0)
-            input('\n错误：可能为模组新增天赋\n')
-        elif mzcw==3:
-            print(tf0)
-            input('\n错误：疑似无文本\n')
-    print('天赋已完成\n')
-    if len(jnz)==0:
-        print('*无技能')
-    for jn0 in jnz:
-        for gjc0 in gjc:
-            pd=jn(gy,jn0,gjc0,ks=ks)
-            if pd==0:
-                mzcw=1
-        if mzcw==1:
-            print(jn0)
-            input('\n错误：疑似无文本\n')
-    print('技能已完成\n')
-    if len(mzz)==0:
-        print('*无模组')
-    for mz0 in mzz:
-        for gjc0 in gjc:
-            pd=mz(gy,mz0,gjc0,ks=ks)
-            if pd==0:
-                mzcw=1
-            elif pd==2:
-                mzcw=2
-        if mzcw==1:
-            input('\n新模组未规范化，请前往手动编辑规范\n')
-        elif mzcw==2:
-            print('\n*基础模组\n')
-    if ks==0:
-        input('模组已完成\n')
-    else:
-        print('已完成\n')
-    return 1
-#cx(fg2(fg(hq('初雪'))),['冻结','寒冷','晕眩','眩晕'])
+    if pd==0 and ks==0:
+        print('未发现'+gjc)
+    return pd
+#find(fg0(fg(hq('杜卡雷，“君主之红”'))),'晕眩')
+def cx(dr,gjc,ks=0):
+    print(dr+'\n')
+    sj=fg0(fg(hq(dr)))
+    for a in gjc:
+        find(sj,a,ks=ks)
+#cx('杜卡雷，“君主之红”',['晕眩','寒冷'])
+def yy(dr,gjc,ks=0):
+    for a in dr:
+        cx(a,gjc,ks=ks)
+        time.sleep(2)
+    print('已完成')
